@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
+    
+    <title>project</title>
+    
+    <link rel='stylesheet'href='../css/utils.css'>
+    <link rel='stylesheet'href='../css/css-1.0.css'>
+    
+    <!--fonts-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!--react-->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <!--react dom-->
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!--transpiler-->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    
+    <!--charts-->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+    <!--local utility scripts-->
+    <script src='../js/utils.js'></script>
+    <script src='../js/script_1.0.js'defer></script>
+</head>
+<body>
+    <main id='root'></main>
+</body>
+<script type='text/babel'>
+'use strict'
+
+const {useState}=React
+const root=ReactDOM.createRoot($('#root'))
+
+//company logo
+{%raw%}
+function Logo({path='analyst.png',size=150,horz=0,vert=0})
+{
+    return(
+        <div className='logo'style={{
+    width:`${size}px`,
+    aspectRatio:1,
+    background:`url(../media/${path}) center`,
+    backgroundSize:'cover',
+    left:`${horz}%`,
+    top:`${vert}%`
+            
+        }}></div>
+        )
+}
+{%endraw%}
+
+//timestamp
+function Timestamp()
+{
+    const time=new Date()
+    
+    const hrs=time.getHours()
+    const min=time.getMinutes()
+    const sec=time.getSeconds()
+    const dte=time.getDate()
+    const mth=time.getMonth()+1
+    const yrs=time.getFullYear()
+    
+    const fmt=(str)=>str>=10?str:`0${str}`
+    
+    
+    return(
+        <p className='timestamp'>{`${fmt(dte)}.${fmt(mth)}.${fmt(yrs)} ${fmt(hrs)}:${fmt(min)}:${fmt(sec)}`}</p>
+        )
+}
+//app navigation bar
+function Navbar({switchPage})
+{
+    return(
+        <div className='navbar'>
+        
+        <button onClick={()=>switchPage('home')}>
+        <i className='fa fa-house'></i>
+        home
+        </button>
+        
+        <button onClick={()=>switchPage('market')}>
+        <i className='fa fa-layer-group'></i>
+        market
+        </button>
+        
+        <button onClick={()=>switchPage('wallet')}>
+        <i className='fa fa-wallet'></i>
+        wallet
+        </button>
+        
+        <button onClick={()=>switchPage('profile')}>
+        <i className='fa fa-user'></i>
+        profile
+        </button>
+        
+        </div>
+        )
+}
+
+//active token
+function ActiveToken()
+{
+    return(
+        <div className='activeToken'>
+        <button className='aT_name'>TPGM <i className='fa fa-chevron-down'></i></button>
+        <span className='aT_coef'>1236x</span>
+        <span className='aT_pctg'>-73.34%</span>
+        </div>
+        )
+}
+
+//chart
+function Chart()
+{
+    return(
+        <div id='candle-chart'className='chart'><ActiveToken/></div>
+        )
+}
+//token info block
+function MarketToken()
+{
+    return(
+        <div className='mT_label'>
+        <p className='mT_token'>
+        <span className='token_abbr'>
+        TPGM/<br/>
+        <span className='token_flop'>3.0</span>
+        </span>
+        </p>
+        <p className='ohlc'>
+        <span className='ohlc_o'>309.21</span>
+        <span className='ohlc_c'>876.03</span>
+        <br/>
+        <span className='ohlc_h'>H: 1020.23</span>
+        <span className='ohlc_l'>L: 100.23</span>
+        </p>
+        <p>
+        <span>23.5x</span><br/>
+        <span className='mT_pctg'>18.46%</span>
+        </p>
+        </div>
+        )
+}
+
+//transaction info block
+function Transaction()
+{
+    return(
+        <div className='transaction'>
+        
+        <p>
+        <span className='trans_item'>fiat</span>
+        <span className='trans_method'>deposit</span><br/>
+        <span className='trans_coefStart'>12.34x</span>→<span className='trans_coefEnd'>13.23x</span>
+        </p>
+        
+        <p className='trans_floatR'>
+        <Timestamp/>
+        <span className='balance trans_gain'><span className='currency'>$</span>34.56</span>
+        </p>
+        
+        </div>
+        )
+}
+
+//create a new account
+function Signup()
+{
+    return(
+        <section className='signup'>
+        <Logo/>
+        <form action='/signup'className='signup_form'>
+        <label><span>username</span><input required type='text'/></label>
+        <label><span>email</span><input required type='email'/></label>
+        <label><span>phone</span><input required type='tel'/></label>
+        <label><span>password</span><input required type='password'/></label>
+        
+        <button>sign up</button>
+        <p>Already have an account? <a href=''>log in</a></p>
+        
+        </form>
+        
+        </section>
+    )
+}
+
+//access an existing account
+function Login()
+{
+    return(
+        <section className='login'>
+        <Logo/>
+        <form action='/login'className='login_form'>
+        <label><span>username</span><input required type='text'/></label>
+        <label><span>password</span><input required type='password'/></label>
+        
+        <button>log in</button>
+        
+        <p>don't have an account? <a href=''>sign up</a></p>
+        </form>
+        </section>
+        )
+}
+
+//home page
+function Home({hp})
+{
+    return(
+        <section className='home'>
+        <Navbar switchPage={hp}/>
+        <Chart/>
+        <button className='timeFrame'>1H</button>
+        <button className='indicator'>
+        <i className='fa fa-bezier-curve'></i>
+        </button>
+        
+        <button className='exe'>execute</button>
+        </section>
+        )
+}
+
+//tokens market
+function Market({mp})
+{
+    return(
+        <section className='marketTokens'>
+        <Navbar switchPage={mp}/>
+        <div className='mT_list'>
+        <MarketToken/>
+        <MarketToken/>
+        <MarketToken/>
+        <MarketToken/>
+        <MarketToken/>
+        <MarketToken/>
+        <MarketToken/>
+        <MarketToken/>
+        <MarketToken/>
+        </div>
+        </section>
+        )
+}
+
+//balance and transactions
+function Wallet({wp})
+{
+    return(
+        <section className='wallet'>
+        <Navbar switchPage={wp}/>
+        <div className='balancePanel'>
+        
+        <p>deposits<br/>
+        <span className='balance'><span className='currency'>kes</span>50.78</span>
+        </p>
+        
+        <p>profits<br/>
+        <span className='balance'><span className='currency'>$</span>2123.32</span>
+        </p>
+        
+        <p>balance |
+        <span className='balance'><span className='currency'>$</span>456.34</span>
+        </p>
+
+        </div>
+        
+        <p className='depositWithdraw'>
+        <button className='deposit'>deposit</button>
+        <button className='withdraw'>withdraw</button>
+        </p>
+        
+        <h4>history</h4>
+        <div className='history'>
+        <Transaction/>
+        <Transaction/>
+        <Transaction/>
+        <Transaction/>
+        <Transaction/>
+        <Transaction/>
+        <Transaction/>
+        </div>
+        
+        </section>
+        )
+}
+
+function Profile({pp})
+{
+    return(
+        <section className='profile'>
+        <Navbar switchPage={pp}/>
+        <p className='profile_actions'>
+        
+        <button className='profile_switch'>switch<i className='fa fa-user'></i></button>
+        
+        <button className='profile_edit'>edit<i className='fa fa-pencil'></i></button>
+        
+        <button className='profile_delete'>delete<i className='fa fa-trash-can'></i>
+        </button>
+        
+        </p>
+
+        <div className='profile_info'>
+        <p>
+        john doe</p>
+        <p>JohnDoe123@gmail.com</p>
+        <p>0113294793</p>
+        </div>
+        <Logo path='dp-2.png' size='200'vert='0'/>
+
+        </section>
+        )
+}
+function App()
+{
+    const [page,setPage]=useState('home')
+    
+    const homePage=page==='home'
+    const marketPage=page==='market'
+    const walletPage=page==='wallet'
+    const profilePage=page==='profile'
+    
+    const handleSwitchPage=(p)=>setPage(p)
+
+    return(
+        <main>
+        {homePage && <Home hp={handleSwitchPage}/>}
+        {marketPage && <Market mp={handleSwitchPage}/>}
+        {walletPage && <Wallet wp={handleSwitchPage}/>}
+        {profilePage && <Profile pp={handleSwitchPage}/>}
+        </main>
+        )
+}
+root.render(<App/>)
+</script>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=0">
+    <title>Lightweight Charts - Candlestick</title>
+    <!-- Include the Lightweight Charts library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        /* Ensure the chart container takes up the desired space */
+        
+        @media (orientation:landscape)
+        {
+            #chart{}
+        }
+        #chart {
+            width: 100%;
+            height: 500px;
+            background:transparent;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Chart Container -->
+    <div id="chart"></div>
+
+    <script>
+        // Create the chart within the 'chart' div container
+        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+            width: document.getElementById('chart').clientWidth, // Responsive width
+            height:document.getElementById('chart').clientHeight, // Height of the chart
+            layout: {
+                textColor: '#666', // Text color
+                backgroundColor:'blue'// Chart
+            },
+            grid: {
+                vertLines: {
+                    color: '#e0e0e0', // Vertical grid line color
+                },
+                horzLines: {
+                    color: '#e0e0e0', // Horizontal grid line color
+                },
+            },
+            rightPriceScale: {
+                borderVisible:false,
+                visible:true// Border color for the price scale
+            },
+            timeScale: {
+                borderColor: '#cccccc', // Border color for the time scale
+                timeVisible: true,
+            }
+        });
+
+        // Add candlestick series to the chart
+        const candlestickSeries = chart.addCandlestickSeries();
+
+        // Set data for the candlestick chart
+        
+        function update()
+        {
+        fetch('http://0.0.0.0:8000/floatIQ/live-data/datapoints')
+        .then(res=>res.json())
+        .then(data=>{
+        candlestickSeries.setData(data);
+        })
+        }
+        update()
+        setInterval(update,5000)
+        
+        
+    </script>
+</body>
+</html>
