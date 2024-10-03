@@ -1,0 +1,2 @@
+# floatIQ
+custom trading platform
