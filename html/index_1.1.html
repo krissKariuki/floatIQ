@@ -1,42 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0">
-    <title>React App</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React Lightweight Chart Component</title>
+  
+  <!-- react -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <!-- react dom -->
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- transpiler -->
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <!-- lightweight charts -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+  <style>
+    #root {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #chart {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
-    <main id='root'></main>
-    
-    <script type="text/babel">
-    const { useState } = React;
+  <div id="root"></div>
 
-    // Home component
-    function Home() {
-        return (
-            <div>
-                <h1>Welcome to the Home Page!</h1>
-            </div>
-        );
-    }
+  <script type="text/babel">
 
-    // Main App component
-    function App() {
-        const [page, setPage] = useState('home');
+  const { useState, useEffect, useRef } = React;
+  const root = ReactDOM.createRoot(document.getElementById('root'));
 
-        return (
-            
-                <Home/>
+  function Chart() {
+    const chartContainerRef = useRef(null);
 
-        );
-    }
+    useEffect(() => {
+      // Create chart
+      const chart = LightweightCharts.createChart(chartContainerRef.current, {
+        width: chartContainerRef.current.clientWidth,
+        height: chartContainerRef.current.clientHeight,
+        layout: {
+          backgroundColor: '#FFFFFF',
+          textColor: '#000',
+        },
+        grid: {
+          vertLines: {
+            color: '#e1e1e1',
+          },
+          horzLines: {
+            color: '#e1e1e1',
+          },
+        },
+        crosshair: {
+          mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        priceScale: {
+          borderColor: '#cccccc',
+        },
+        timeScale: {
+          borderColor: '#cccccc',
+        },
+      });
 
-    // Render App to the root
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-    </script>
+      // Create a candlestick series
+      const candleSeries = chart.addCandlestickSeries();
+
+      // Sample data
+      candleSeries.setData([
+        { time: '2024-10-01', open: 71.25, high: 73.0, low: 70.5, close: 72.75 },
+        { time: '2024-10-02', open: 72.75, high: 74.0, low: 71.25, close: 73.5 },
+        { time: '2024-10-03', open: 73.5, high: 75.0, low: 72.5, close: 74.0 },
+        { time: '2024-10-04', open: 74.0, high: 76.0, low: 73.25, close: 75.75 },
+      ]);
+
+      // Handle resize
+      const handleResize = () => {
+        chart.applyOptions({ width:clientWidth});
+      };
+
+      window.addEventListener('resize', handleResize);
+
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        chart.remove();
+      };
+    }, []);
+
+    return <div ref={chartContainerRef} id="chart"></div>;
+  }
+
+  function App() {
+    return (
+      <Chart />
+    );
+  }
+
+  root.render(<App />);
+  </script>
 </body>
 </html>

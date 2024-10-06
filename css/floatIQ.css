@@ -44,7 +44,8 @@ a {
 .navbar {
     width: 100%;
     height: 8vh;
-    background: var(--secondary);
+    background: var(--primary);
+    border-top:1px solid var(--secondary);
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-around;
@@ -55,11 +56,17 @@ a {
 .navbar button {
     width: 20%;
     height: 80%;
+    background:var(--primary);
+    color:#bbb;
     font-size: var(--s);
     font-weight: 300;
     text-transform: capitalize;
     border: none;
 }
+.activeTab {
+    color:black!important;border-top:1px solid black!important;
+}
+
 .activeToken {
     width: max-content;
     background: var(--primary);
@@ -93,14 +100,34 @@ a {
 .exe {
     float: right;
 }
-
+.marketPage h4{
+    text-transform:capitalize;width:90%;border-bottom:1px solid var(--secondary);margin-left:var(--m);font-weight:400;margin-bottom:var(--xxs);
+}
+.performanceLabel span{
+    font-size:12px;color:black;padding:0 var(--xxs);
+}
+.marketPerformance{
+    width:90%;background:var(--secondary);margin: var(--xs) auto var(--m);padding:var(--s);text-transform:capitalize;display:flex;flex-flow:row wrap;justify-content:center;align-items:center;font-size:var(--s);text-align:center;
+}
+.marketPerformance p{
+    padding:var(--s);font-size:var(--s);
+}
+.marketPerformance span{
+    font-size:var(--m);
+}
+.marketPerformance span:nth-child(1){
+    font-size:var(--l);
+}
+.marketPerformance p:nth-child(4){
+    width:100%;background:var(--primary);
+}
 .mT_list {
     background: var(--secondary);
     border: 1px solid var(--secondary);
-    height: 80%;
+    height: 55%;
     overflow: scroll;
 }
-.mT_label {
+.marketToken {
     width: 95%;
     display: flex;
     flex-flow: row wrap;

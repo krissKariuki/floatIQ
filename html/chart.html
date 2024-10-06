@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=0">
-    <title>Lightweight Charts - Candlestick</title>
+    <title>Lightweight Charts - Line Chart</title>
     <!-- Include the Lightweight Charts library -->
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
@@ -32,7 +32,7 @@
             height:document.getElementById('chart').clientHeight, // Height of the chart
             layout: {
                 textColor: '#666', // Text color
-                backgroundColor:'blue'// Chart
+                backgroundColor:'blue'// Chart background color
             },
             grid: {
                 vertLines: {
@@ -44,7 +44,7 @@
             },
             rightPriceScale: {
                 borderVisible:false,
-                visible:true// Border color for the price scale
+                visible:true // Border color for the price scale
             },
             timeScale: {
                 borderColor: '#cccccc', // Border color for the time scale
@@ -52,23 +52,37 @@
             }
         });
 
-        // Add candlestick series to the chart
-        const candlestickSeries = chart.addCandlestickSeries();
+        // Add line series to the chart instead of candlestick series
+        
+        const candleSeries=chart.addCandlestickSeries()
+        
+        const lineSeries = chart.addLineSeries({color:'green',lineWidth:2,lineType:LightweightCharts.LineType.Normal});
 
-        // Set data for the candlestick chart
-        
-        function update()
-        {
-        fetch('http://0.0.0.0:8000/floatIQ/live-data/datapoints')
-        .then(res=>res.json())
-        .then(data=>{
-        candlestickSeries.setData(data);
-        })
+        // Set data for the line chart
+        (function init() {
+            fetch('http://0.0.0.0:8000/floatIQ/live-data/datapoints')
+            .then(res => res.json())
+            .then(data => {
+                const DATA=data.map(obj=>{
+                    return({time:obj.time,value:obj.close})
+                })
+                //candleSeries.setData(data)
+                lineSeries.setData(DATA);
+            });
+        })()
+
+        function update() {
+            fetch('http://0.0.0.0:8000/floatIQ/live-data/datapoint')
+            .then(res => res.json())
+            .then(data => {
+                const DATA={time:data.time,value:data.close}
+                
+                //candleSeries.update(data)
+                lineSeries.update(DATA);
+            });
         }
-        update()
-        setInterval(update,5000)
-        
-        
+
+        setInterval(update,1000);
     </script>
 </body>
 </html>

@@ -8,28 +8,26 @@ import threading
 app=Flask(__name__)
 CORS(app)
 
-#________________utility functions__________________
+#________________utility functions_________________
 
 #running tasks concurrently
 def thread(func,*args):
     threading.Thread(target=func,args=(args)).start()
     
 #run task endlessly at specified time intervals
-def exeiter(func,period='seconds',interval=1):
-    timeDict={
-        'seconds':lambda T:T.second,
-        'minutes':lambda T:T.minute,
-        'hours':lambda T:T.hour
-    }
-    def timeToUpdate(T):
-       return timeDict[period](T)%interval==0 #and T.second==00
+def exeiter(func,sleep=1,interval=1):
+    
+    timeBasis=lambda T:T.minute
+    
+    def timeToUpdate(t):
+       return timeBasis(t)%interval==0
     
     while True:
         timeNow=datetime.now()
         
         if timeToUpdate(timeNow):func()
             
-        time.sleep(1)
+        time.sleep(sleep)
 
 #source of data stream
 sourceData='../db/mozzart.json'
@@ -43,15 +41,15 @@ OPEN=0
 HIGH=float('-inf')
 LOW=float('inf')
 CLOSE=0
-DTTM=''
+DTTM=datetime.now().timestamp()
 
 FORMAT={}
 datapoint={}
 datapoints=[]
 
 #produce processed data in the background endlessly 
-def source(token=3):
-    global i,HIGH,LOW,CLOSE
+def source(token=65):
+    global i,HIGH,LOW,CLOSE,DTTM,datapoint
     
     M=rawData[i][0]
     
@@ -61,6 +59,8 @@ def source(token=3):
     HIGH=max(OPEN,HIGH,CLOSE)
     LOW=min(OPEN,LOW,CLOSE)
     
+    datapoint={'time':DTTM,'open':OPEN,'high':HIGH,'low':LOW,'close':CLOSE}
+
     if i>=len(rawData):i=0
     i+=1
 
@@ -70,13 +70,12 @@ def feed():
     
     DTTM=datetime.now().timestamp()
 
-    datapoint={'time':DTTM,'open':OPEN,'high':HIGH,'low':LOW,'close':CLOSE}
-    
     datapoints.append(datapoint)
     
     OPEN=CLOSE
     HIGH=float('-inf')
     LOW=float('inf')
+    
 
 #tokens data extraction
 fmt='../db/format_1.1.json'
@@ -100,9 +99,9 @@ def liveDatapoints():
     return jsonify(datapoints)
 
 
-#____inititalize background processes________
-thread(exeiter,source,'seconds')
-thread(exeiter,feed,'seconds',5)
+#__________inititalize background processes________
+thread(exeiter,source)
+thread(exeiter,feed,60,15)
 
 if __name__=='__main__':
     app.run(debug=True,host='0.0.0.0',port=8000)

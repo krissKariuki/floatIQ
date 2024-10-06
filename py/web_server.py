@@ -4,9 +4,14 @@ from flask_cors import CORS
 app=Flask(__name__,template_folder='../html')
 CORS(app)
 
-@app.route('/floatIQ/app')
-def render () :
-    return render_template('index_1.0.html')
+fileMap={
+    'app':'floatIQ.html',
+    'chart':'chart.html'
+}
+
+@app.route('/floatIQ/<file>')
+def render (file) :
+    return render_template(fileMap[file])
 
 def SFD(dirs):
     for DIR in dirs:

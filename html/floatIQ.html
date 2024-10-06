@@ -7,7 +7,7 @@
     <title>project</title>
     
     <link rel='stylesheet'href='../css/utils.css'>
-    <link rel='stylesheet'href='../css/css-1.0.css'>
+    <link rel='stylesheet'href='../css/floatIQ.css'>
     
     <!--fonts-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -32,10 +32,10 @@
 <script type='text/babel'>
 'use strict'
 
-const {useState}=React
+const {useState,useEffect,useRef}=React
 const root=ReactDOM.createRoot($('#root'))
 
-//company logo
+//logo image
 {%raw%}
 function Logo({path='analyst.png',size=150,horz=0,vert=0})
 {
@@ -72,28 +72,29 @@ function Timestamp()
         <p className='timestamp'>{`${fmt(dte)}.${fmt(mth)}.${fmt(yrs)} ${fmt(hrs)}:${fmt(min)}:${fmt(sec)}`}</p>
         )
 }
+
 //app navigation bar
-function Navbar({switchPage})
+function Navbar({activeTab,switchPage})
 {
     return(
         <div className='navbar'>
         
-        <button onClick={()=>switchPage('home')}>
+        <button onClick={()=>switchPage('home')} className={activeTab==='home'?'activeTab':''}>
         <i className='fa fa-house'></i>
         home
         </button>
         
-        <button onClick={()=>switchPage('market')}>
+        <button onClick={()=>switchPage('market')} className={activeTab==='market'?'activeTab':''}>
         <i className='fa fa-layer-group'></i>
         market
         </button>
         
-        <button onClick={()=>switchPage('wallet')}>
+        <button onClick={()=>switchPage('wallet')} className={activeTab==='wallet'?'activeTab':''}>
         <i className='fa fa-wallet'></i>
         wallet
         </button>
         
-        <button onClick={()=>switchPage('profile')}>
+        <button onClick={()=>switchPage('profile')} className={activeTab==='profile'?'activeTab':''}>
         <i className='fa fa-user'></i>
         profile
         </button>
@@ -115,17 +116,68 @@ function ActiveToken()
 }
 
 //chart
-function Chart()
-{
-    return(
-        <div id='candle-chart'className='chart'><ActiveToken/></div>
-        )
-}
+  function Chart({hist,live})
+  {
+      const chartRef=useRef(null)
+      
+      useEffect(()=>{
+          const chart=LightweightCharts.createChart(
+        chartRef.current,{
+            
+        width:chartRef.current.width,
+        
+        height:chartRef.current.height,
+        
+        layout: {backgroundColor: '#eee',textColor: '#666'},
+        
+        grid: {vertLines: {color: '#e1e1e1',},horzLines: {color: '#e1e1e1',},},
+        
+        crosshair: {mode: LightweightCharts.CrosshairMode.Normal},
+        
+        rightPriceScale: {borderColor: '#eee'},
+        
+        timeScale: {borderColor: '#eee'}
+        
+          })
+          
+          const candlesticks=chart.addCandlestickSeries()
+          
+          function load()
+          {
+              fetch(hist)
+              .then(res=>res.json())
+              .then(DATA=>{
+                  candlesticks.setData(DATA)
+              })
+              
+          }
+          load()
+          
+          function update()
+          {
+              fetch(live)
+              .then(res=>res.json())
+              .then(DATA=>{
+                  candlesticks.update(DATA)
+              })
+              
+          }
+          addEventListener('resize',()=>{
+              chart.applyOptions({width:innerWidth,height:innerHeight*0.75})
+          })
+          setInterval(update,1000)
+          
+      },[])
+      
+      return <div ref={chartRef} id="candle-chart"></div>
+
+  }
+  
 //token info block
 function MarketToken()
 {
     return(
-        <div className='mT_label'>
+        <div className='marketToken'>
         <p className='mT_token'>
         <span className='token_abbr'>
         TPGM/<br/>
@@ -140,7 +192,7 @@ function MarketToken()
         <span className='ohlc_l'>L: 100.23</span>
         </p>
         <p>
-        <span>23.5x</span><br/>
+        <span>23.5</span><br/>
         <span className='mT_pctg'>18.46%</span>
         </p>
         </div>
@@ -208,12 +260,14 @@ function Login()
 }
 
 //home page
-function Home({hp})
+function Home({histChart,liveChart,ht,hp})
 {
     return(
         <section className='home'>
-        <Navbar switchPage={hp}/>
-        <Chart/>
+        <Navbar activeTab={ht} switchPage={hp}/>
+        
+        <Chart hist={histChart} live={liveChart}/>
+
         <button className='timeFrame'>1H</button>
         <button className='indicator'>
         <i className='fa fa-bezier-curve'></i>
@@ -225,11 +279,22 @@ function Home({hp})
 }
 
 //tokens market
-function Market({mp})
+function Market({mt,mp})
 {
     return(
-        <section className='marketTokens'>
-        <Navbar switchPage={mp}/>
+        <section className='marketPage'>
+        <Navbar activeTab={mt} switchPage={mp}/>
+        
+        <h4 className='performanceLabel'>performance |<span>past 1 hour</span></h4>
+
+        <div className='marketPerformance'>
+        <p>high<br/><span>1244.44</span></p>
+        <p>avg<br/><span>800.12</span></p>
+        <p>low<br/><span>429.92</span></p>
+        <p>current | <span>678.22</span></p>
+        </div>
+        
+        <h4>Tokens</h4>
         <div className='mT_list'>
         <MarketToken/>
         <MarketToken/>
@@ -246,15 +311,15 @@ function Market({mp})
 }
 
 //balance and transactions
-function Wallet({wp})
+function Wallet({wt,wp})
 {
     return(
         <section className='wallet'>
-        <Navbar switchPage={wp}/>
+        <Navbar activeTab={wt} switchPage={wp}/>
         <div className='balancePanel'>
         
         <p>deposits<br/>
-        <span className='balance'><span className='currency'>kes</span>50.78</span>
+        <span className='balance'><span className='currency'>$</span>50.78</span>
         </p>
         
         <p>profits<br/>
@@ -287,11 +352,12 @@ function Wallet({wp})
         )
 }
 
-function Profile({pp})
+//user profile
+function Profile({pt,pp})
 {
     return(
         <section className='profile'>
-        <Navbar switchPage={pp}/>
+        <Navbar activeTab={pt} switchPage={pp}/>
         <p className='profile_actions'>
         
         <button className='profile_switch'>switch<i className='fa fa-user'></i></button>
@@ -309,28 +375,34 @@ function Profile({pp})
         <p>JohnDoe123@gmail.com</p>
         <p>0113294793</p>
         </div>
-        <Logo path='dp-2.png' size='200'vert='0'/>
+        <Logo path='dp-2.png' size='200'/>
 
         </section>
         )
 }
+
+//app
 function App()
 {
     const [page,setPage]=useState('home')
+    
+    const [historyData,setHistoryData]=useState('http://0.0.0.0:8000/floatIQ/live-data/datapoints')
+    const [liveData,setLiveData]=useState('http://0.0.0.0:8000/floatIQ/live-data/datapoint')
+    
     
     const homePage=page==='home'
     const marketPage=page==='market'
     const walletPage=page==='wallet'
     const profilePage=page==='profile'
     
-    const handleSwitchPage=(p)=>setPage(p)
+    const handleSwitchPage=(pg)=>setPage(pg)
 
     return(
         <main>
-        {homePage && <Home hp={handleSwitchPage}/>}
-        {marketPage && <Market mp={handleSwitchPage}/>}
-        {walletPage && <Wallet wp={handleSwitchPage}/>}
-        {profilePage && <Profile pp={handleSwitchPage}/>}
+        {homePage && <Home histChart={historyData} liveChart={liveData} ht={page} hp={handleSwitchPage}/>}
+        {marketPage && <Market mt={page} mp={handleSwitchPage}/>}
+        {walletPage && <Wallet wt={page} wp={handleSwitchPage}/>}
+        {profilePage && <Profile pt={page} pp={handleSwitchPage}/>}
         </main>
         )
 }
