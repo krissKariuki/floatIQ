@@ -6,14 +6,14 @@
   <title>React Lightweight Chart Component</title>
   
   <!-- react -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<!--  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <!-- react dom -->
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<!--  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <!-- transpiler -->
-  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<!--  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
   <!-- lightweight charts -->
-  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-
+<!--  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+-->
   <style>
     #root {
       width: 100%;
@@ -22,73 +22,20 @@
       justify-content: center;
       align-items: center;
     }
-    #chart {
-      width: 100%;
-      height: 100%;
-    }
   </style>
 </head>
 <body>
   <div id="root"></div>
   
-  <script type="text/babel">
+  <script>
   'use strict'
-  const { useState, useEffect, useRef } = React;
-  const root = ReactDOM.createRoot(document.getElementById('root'));
   
-  function Chart({data})
-  {
-      const chartRef=useRef(null)
-      
-      useEffect(()=>{
-          const chart=LightweightCharts.createChart(
-        chartRef.current,{
-            
-        width: chartRef.current.clientWidth,
-        
-        height: chartRef.current.clientHeight,
-        
-        layout: {backgroundColor: '#FFFFFF',textColor: '#666',},
-        
-        grid: {vertLines: {color: '#e1e1e1',},horzLines: {color: '#e1e1e1',},},
-        
-        crosshair: {mode: LightweightCharts.CrosshairMode.Normal},
-        
-        priceScale: {borderColor: '#cccccc'},
-        
-        timeScale: {borderColor: '#cccccc'}
-        
-          })
-          
-          const candlesticks=chart.addCandlestickSeries()
-          
-          function load()
-          {
-              fetch(data)
-              .then(res=>res.json())
-              .then(DATA=>{
-                  candlesticks.setData(DATA)
-              })
-              
-          }
-          load()
-      },[])
-      
-      return <div ref={chartRef} id="chart"></div>
-
+  const source=new EventSource('http://0.0.0.0:8000/floatIQ/stream/datapoint')
+  
+  source.onmessage=(evet)=>{
+      const data=JSON.stringify(event.data)
+      document.getElementById('root').innerText=data
   }
-  
-  function App()
-  {
-      const [previous,setPrevious]=useState('http://0.0.0.0:8000/floatIQ/live-data/datapoints')
-      
-      return(
-          <Chart data={previous}/>
-          )
-  }
-  
-  root.render(<App/>)
-  
   </script>
 </body>
 </html>
