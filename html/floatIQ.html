@@ -153,19 +153,15 @@ function ActiveToken()
           }
           load()
           
-          function update()
-          {
-              fetch(live)
-              .then(res=>res.json())
-              .then(DATA=>{
-                  candlesticks.update(DATA)
-              })
-              
+          const source=new EventSource(live)
+          
+          source.onmessage=(event)=>{
+              const data=JSON.parse(event.data)
+              candlesticks.update(data)
           }
           addEventListener('resize',()=>{
               chart.applyOptions({width:innerWidth,height:innerHeight*0.75})
           })
-          setInterval(update,1000)
           
       },[])
       
@@ -386,8 +382,8 @@ function App()
 {
     const [page,setPage]=useState('home')
     
-    const [historyData,setHistoryData]=useState('http://0.0.0.0:8000/floatIQ/live-data/datapoints')
-    const [liveData,setLiveData]=useState('http://0.0.0.0:8000/floatIQ/live-data/datapoint')
+    const [historyData,setHistoryData]=useState('http://0.0.0.0:8000/floatIQ/fetch/datapoints')
+    const [liveData,setLiveData]=useState('http://0.0.0.0:8000/floatIQ/stream/datapoint')
     
     
     const homePage=page==='home'

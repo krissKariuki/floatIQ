@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=0">
+    <title>OHLC Live Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin:0 auto;}
+        table { width: 50%; margin: 20px auto; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: center; border: 1px solid #ccc; }
+        tr{
+            font-size:0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center;">OHLC Live Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Close</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="ohlc-table-body">
+            <tr>
+                <td id="open"></td>
+                <td id="high"></td>
+                <td id="low"></td>
+                <td id="close"></td>
+                <td id="dttm"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Connect to the SSE stream
+        const eventSource = new EventSource('http://0.0.0.0:8000/floatIQ/stream/datapoint');
+
+        // Listen for messages from the server
+        eventSource.onmessage=(event)=>{
+            const data = JSON.parse(event.data);
+            const time=new Date(data.time*1000).toLocaleString()
+            
+            document.getElementById('open').innerText = data.open;
+            document.getElementById('high').innerText = data.high;
+            document.getElementById('low').innerText = data.low;
+            document.getElementById('close').innerText = data.close;
+            document.getElementById('dttm').innerText = time
+        };
+    </script>
+</body>
+</html>

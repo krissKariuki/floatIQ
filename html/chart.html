@@ -60,7 +60,7 @@
 
         // Set data for the line chart
         (function init() {
-            fetch('http://0.0.0.0:8000/floatIQ/live-data/datapoints')
+            fetch('http://0.0.0.0:8000/floatIQ/fetch/datapoints')
             .then(res => res.json())
             .then(data => {
                 const DATA=data.map(obj=>{
@@ -71,18 +71,16 @@
             });
         })()
 
-        function update() {
-            fetch('http://0.0.0.0:8000/floatIQ/live-data/datapoint')
-            .then(res => res.json())
-            .then(data => {
-                const DATA={time:data.time,value:data.close}
-                
-                //candleSeries.update(data)
-                lineSeries.update(DATA);
-            });
+        const source=new EventSource('http://0.0.0.0:8000/floatIQ/stream/datapoint')
+        source.onmessage=(event)=>{
+            
+            const data=JSON.parse(event.data)
+            DATA={"time":data.time,"value":data.close}
+            
+            lineSeries.update(DATA)
+            
         }
 
-        setInterval(update,1000);
     </script>
 </body>
 </html>
