@@ -19,7 +19,7 @@ datapoint={}
 datapoints=[]
 
 #obtain data for simulation
-sourceFilePath='../db/mozzart.json'
+sourceFilePath='../db/c77.json'
 with open(sourceFilePath,'r') as sourceFile:
     sourceData=json.load(sourceFile)[::-1]
 
@@ -43,7 +43,7 @@ def eventStream():
         time.sleep(1)
 
 #create & update global variables
-def processor(token=2,timeframe='second',interval=5):
+def processor(token=2,unit='second',interval=5):
     global i,OPEN,HIGH,LOW,CLOSE,DTTM,datapoint,datapoints
     
     #dict to enable timeframe input from current function
@@ -56,11 +56,11 @@ def processor(token=2,timeframe='second',interval=5):
     }
     
     #variable to check for a desired time to run an update
-    timeCheck=timeframeMap[timeframe](interval)
+    timeCheck=timeframeMap[unit](interval)
     
-    M=sourceData[i][0]
+    noise=sourceData[i][0]
     
-    if M>token:
+    if noise>token:
         CLOSE+=token-1
     else :
         CLOSE-=1
@@ -70,7 +70,7 @@ def processor(token=2,timeframe='second',interval=5):
     LOW=min(OPEN,LOW,CLOSE)
     
     #modify datapoint object with new data
-    datapoint={'time':DTTM,'open':OPEN,'high':HIGH,'low':LOW,'close':CLOSE}
+    datapoint={'time':DTTM,'noise':noise,'open':OPEN,'high':HIGH,'low':LOW,'close':CLOSE}
     i+=1
     
     #check whether it is time to update variables
@@ -97,7 +97,7 @@ def fetchDatapoints():
 if __name__=='__main__':
     
     # run the processor function endlessly in the background in separate thread
-    THREAD(executeInfinitely,processor,15,'minute',15)
+    THREAD(executeInfinitely,processor,65,'minute',15)
     
     #run the application
     app.run(debug=True,host='localhost',port=8000)
