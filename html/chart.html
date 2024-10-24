@@ -75,7 +75,7 @@
         source.onmessage=(event)=>{
             
             const data=JSON.parse(event.data)
-            DATA={"time":data.time,"value":data.close}
+            DATA={"time":data.time,"value":data.noise}
             
             lineSeries.update(DATA)
             

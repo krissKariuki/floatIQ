@@ -1,0 +1,37 @@
+{
+    "tokens": {
+        "bingem":{"abbr":"BING","flop":2.00,"weight":0.010
+        },
+        "tripgem":{"abbr":"TRPG","flop":3.00,"weight":0.015
+        },
+        "pentime":{"abbr":"PETIM","flop":5.00,"weight":0.025
+        },
+        "decadime":{"abbr":"DEDI","flop":10.00,"weight":0.050
+        },
+        "teendime":{"abbr":"TENDI","flop":15.00,"weight":0.075
+        },
+        "duodeca":{"abbr":"DUDE","flop":20.00,"weight":0.100
+        },
+        "trideca":{
+            "abbr":"TRIDE","flop":35.00,"weight":0.175
+        },
+        "quadeca":{"abbr":"QUADE","flop":45.00,"weight":0.225
+        },
+        "hexdeca":{"abbr":"HEXDE","flop":65,"weight":0.325
+        }
+    },
+    "aggregate":{"abbr":"AGGR","flop":200,"weight":1.000},
+    "timeFrames":{
+        
+        "minute1":{"unit":"minute","interval":1},
+        "minute5":{"unit":"minute","interval":5},
+        "minute15":{"unit":"minute","interval":15},
+        "minute30":{"unit":"minute","interval":30},
+        "hour1":{"unit":"hour","interval":1},
+        "hour4":{"unit":"hour","interval":4},
+        "hour6":{"unit":"hour","interval":6},
+        "hour12":{"unit":"hour","interval":12},
+        "day1":{"unit":"day","interval":1},
+        "week1":{"unit":"week","interval":1}
+    }
+}
