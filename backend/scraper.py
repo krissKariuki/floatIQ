@@ -44,7 +44,7 @@ class Navigator:
         
         self.driver=webdriver.Chrome(options=options,service=service)
 
-    def action(self,action:str='',attribute:str='',timeout:int=30,sleep:int=0,input_value:str='',message:str='',function:Callable[[],None]=None)->None:
+    def action(self,action:str='',attribute:str='',timeout:int=30,sleep:int=0,input_value:str='',message:str='',track:Callable[[],None]=None)->None:
         self.actions_list.append({key:value for key,value in locals().items() if key !='self'})
 
     def action_executer(self,action):
@@ -60,8 +60,9 @@ class Navigator:
             element=WebDriverWait(self.driver,action['timeout']).until(EC.presence_of_element_located((By.XPATH,f'//*[@{action['attribute']}]')))
             element.send_keys(action['input_value']+Keys.RETURN)
 
-        def function():
-            action['function']()
+        def track():
+            element=WebDriverWait(self.driver,action['timeout']).until(EC.presence_of_element_located((By.XPATH,f'//*[@{action['attribute']}]')))
+            
         
         def execute_action(action_action):
             time.sleep(action['sleep'])
@@ -74,7 +75,7 @@ class Navigator:
             'click':lambda:click(),
             'write':lambda:write(),
             'send':lambda:send(),
-            'function':lambda:function()
+            'track':lambda:track()
         }
         execute_action(action_hash_map[action['action']])
 
